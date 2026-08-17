@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#12382f" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2218%22 fill=%22%2312382f%22/><text x=%2232%22 y=%2240%22 text-anchor=%22middle%22 font-size=%2224%22 fill=%22white%22>VO</text></svg>" />
+    <meta
+      name="description"
+      content="Reserve seu lote no loteamento Vale do Ouro direto pelo mapa, sem precisar de corretor."
+    />
+    <title>Vale do Ouro | Reserve seu lote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=20260817-public1" />
+  </head>
+  <body class="authenticated public-page">
+    <header class="site-header">
+      <a class="brand" href="publico.html">
+        <span class="brand-mark">VO</span>
+        <span>
+          <strong>Vale do Ouro</strong>
+          <small>Reserve seu lote</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-button" id="openTechnicalMap" type="button">Planta técnica</button>
+        <a class="nav-button" href="index.html">Sou corretor</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">Reserva direta, sem corretor</p>
+          <h1 id="heroTitle">Escolha seu lote no mapa e reserve na hora.</h1>
+          <p>
+            Veja área, preço e condições de cada lote e garanta o seu com uma reserva provisória de 5 dias
+            corridos, tempo suficiente para organizar a documentação.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#mapa-publico">Ver o mapa</a>
+          </div>
+        </div>
+        <div class="hero-summary" id="summaryCards" aria-label="Resumo da disponibilidade"></div>
+      </section>
+
+      <section class="workspace" id="mapa-publico" aria-labelledby="mapTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Escolha o lote</p>
+            <h2 id="mapTitle">Selecione pela localização real</h2>
+          </div>
+          <p class="section-note">A vista aérea acompanha a orientação da planta técnica.</p>
+        </div>
+
+        <div class="toolbar" aria-label="Filtros do mapa">
+          <label class="search-field">
+            <span>Buscar</span>
+            <input id="searchInput" type="search" placeholder="Ex.: B-4 ou quadra B" autocomplete="off" />
+          </label>
+          <label>
+            <span>Quadra</span>
+            <select id="blockFilter">
+              <option value="all">Todas</option>
+            </select>
+          </label>
+          <label>
+            <span>Situação</span>
+            <select id="statusFilter">
+              <option value="all">Todas</option>
+              <option value="disponivel">Disponíveis</option>
+              <option value="reservado">Reservados</option>
+              <option value="vendido">Vendidos</option>
+              <option value="indisponivel">Indisponíveis</option>
+              <option value="sem_cadastro">Cadastro pendente</option>
+            </select>
+          </label>
+          <button class="button button-small" id="clearFilters" type="button">Limpar filtros</button>
+        </div>
+
+        <div class="map-view-switch" role="group" aria-label="Forma de visualizar os lotes">
+          <button class="active" id="aerialMapButton" type="button">Mapa real</button>
+          <button id="blockMapButton" type="button">Grade por quadras</button>
+          <span>Arraste as barras ou use os dedos para percorrer a planta.</span>
+        </div>
+
+        <div class="legend" aria-label="Legenda de situação">
+          <span><i class="status-dot disponivel"></i>Disponível</span>
+          <span><i class="status-dot reservado"></i>Reservado</span>
+          <span><i class="status-dot vendido"></i>Vendido</span>
+          <span><i class="status-dot indisponivel"></i>Indisponível</span>
+          <span><i class="status-dot sem_cadastro"></i>Cadastro pendente</span>
+        </div>
+
+        <div class="map-and-detail">
+          <div class="commercial-map" id="commercialMap" tabindex="0" aria-live="polite" aria-label="Mapa interativo; deslize para cima, para baixo e para os lados"></div>
+          <aside class="lot-panel" id="lotPanel" aria-live="polite">
+            <div class="empty-selection">
+              <span class="empty-icon">⌖</span>
+              <h3>Selecione um lote</h3>
+              <p>Clique em qualquer lote do mapa para ver área, preço e simular o pagamento.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Vale do Ouro · Reserva direta</span>
+      <span>Sua reserva fica ativa por 5 dias corridos.</span>
+    </footer>
+
+    <dialog id="reservationDialog" class="modal">
+      <form id="reservationForm" method="dialog">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">Reserva provisória · 5 dias corridos</p>
+            <h2 id="reservationTitle">Reservar lote</h2>
+          </div>
+          <button class="icon-button" value="cancel" aria-label="Fechar" formnovalidate>×</button>
+        </div>
+        <div class="live-notice">
+          Sua reserva fica garantida por 5 dias corridos. Nesse período, entraremos em contato para seguir com a
+          documentação.
+        </div>
+        <label>
+          <span>Seu nome</span>
+          <input name="customer" required maxlength="120" />
+        </label>
+        <label>
+          <span>Seu telefone / WhatsApp</span>
+          <input name="phone" required inputmode="tel" maxlength="24" />
+        </label>
+        <div class="modal-actions">
+          <button class="button button-ghost" value="cancel" formnovalidate>Cancelar</button>
+          <button class="button button-primary" id="confirmReservationButton" value="default">Confirmar reserva</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="technicalMapDialog" class="modal technical-modal">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">Projeto de desmembramento</p>
+          <h2>Recortes da planta técnica</h2>
+        </div>
+        <button class="icon-button" id="closeTechnicalMap" type="button" aria-label="Fechar">×</button>
+      </div>
+      <p class="technical-note">
+        Use estes recortes para conferir a implantação. Medidas e limites oficiais devem ser validados no projeto aprovado.
+      </p>
+      <div class="technical-gallery">
+        <figure><img src="assets/planta-setor-abc.png" alt="Planta técnica das quadras A, B e C" /><figcaption>Setor A–C</figcaption></figure>
+        <figure><img src="assets/planta-setor-deg.png" alt="Planta técnica do encontro das quadras D, E, F e G" /><figcaption>Encontro D–G</figcaption></figure>
+        <figure class="wide"><img src="assets/planta-setor-hn.png" alt="Planta técnica das quadras H a N" /><figcaption>Setor H–N</figcaption></figure>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="config.js?v=20260817-public1"></script>
+    <script type="module" src="public.js?v=20260817-public1"></script>
+  </body>
+</html>

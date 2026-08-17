@@ -35,6 +35,16 @@ Depois abra `http://localhost:4173`.
 3. Em **Build and deployment**, selecione **Deploy from a branch**.
 4. Escolha a branch principal e a pasta raiz.
 
+## Reserva pública, sem corretor
+
+`publico.html` é uma página separada (link "Reservar sem corretor" no cabeçalho de
+`index.html`) onde qualquer visitante pode ver o mapa interativo e reservar um lote
+disponível sem fazer login, com validade fixa de 5 dias corridos. Ela usa duas funções
+novas no Supabase (`public_list_lots` e `public_reserve_lot`) que precisam ser criadas
+uma única vez: rode `supabase/public-reservation.sql` no SQL Editor do projeto. O
+arquivo tem um comentário no topo explicando as suposições sobre o schema — confira
+antes de rodar.
+
 ## Configuração do Supabase
 
 O projeto já usa autenticação, leitura protegida dos lotes e a função de reserva. O arquivo `config.js` contém apenas a URL e a chave **publicável** do projeto, apropriadas para um site público com RLS ativado. Nunca coloque uma chave `secret` ou `service_role` no site ou no GitHub.

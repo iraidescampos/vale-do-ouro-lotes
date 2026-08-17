@@ -1,3 +1,6 @@
+import { createMapZoom } from "./map-zoom.js";
+import { bindCurrencyInput } from "./currency-input.js";
+
 const STATUS = {
   disponivel: "Disponível",
   reservado: "Reservado",
@@ -14,14 +17,23 @@ const config = window.VALE_CONFIG ?? {};
 
 const state = { lots: [], mapGeometry: null, lotMeasurements: null, selectedId: null, query: "", block: "all", status: "all", session: null, mapMode: "aerial", isAdmin: false, adminReservations: [], adminHistory: [], adminBrokers: [], adminBrokersError: "", adminTab: "lots" };
 let supabase;
-let mapTouch = null;
 let suppressMapClick = false;
+
+const aerialZoom = createMapZoom({
+  onDragEnd: () => {
+    suppressMapClick = true;
+    window.setTimeout(() => { suppressMapClick = false; }, 400);
+  },
+});
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
 const dateTime = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
 
 const elements = {
+  hero: document.querySelector(".hero"),
+  pageMapa: document.querySelector("#mapa"),
+  pageLotes: document.querySelector("#lotes"),
   map: document.querySelector("#commercialMap"),
   panel: document.querySelector("#lotPanel"),
   table: document.querySelector("#lotsTableBody"),
@@ -58,6 +70,12 @@ const elements = {
   adminLotDialog: document.querySelector("#adminLotDialog"),
   adminLotForm: document.querySelector("#adminLotForm"),
   saveAdminLotButton: document.querySelector("#saveAdminLot"),
+};
+
+const adminLotMoney = {
+  pricePerM2: bindCurrencyInput(elements.adminLotForm.elements.pricePerM2),
+  totalPrice: bindCurrencyInput(elements.adminLotForm.elements.totalPrice),
+  downPayment: bindCurrencyInput(elements.adminLotForm.elements.downPayment),
 };
 
 function escapeHtml(value) {
@@ -142,7 +160,7 @@ function measurementsMarkup(lot) {
 function renderSummary() {
   const counts = state.lots.reduce((acc, lot) => ({ ...acc, [lot.status]: (acc[lot.status] || 0) + 1 }), {});
   elements.summary.innerHTML = `
-    <article class="summary-card featured"><span>Total no mapa</span><strong>${state.lots.length}</strong><span>lotes sincronizados com o Supabase</span></article>
+    <article class="summary-card featured"><span>Total no mapa</span><strong>${state.lots.length}</strong><span>lotes no loteamento</span></article>
     <article class="summary-card"><span>Disponíveis</span><strong>${counts.disponivel || 0}</strong></article>
     <article class="summary-card"><span>Reservados</span><strong>${counts.reservado || 0}</strong></article>
     <article class="summary-card"><span>Vendidos</span><strong>${counts.vendido || 0}</strong></article>
@@ -188,13 +206,20 @@ function renderAerialMap() {
       <polygon points="${points}"></polygon><text x="${centerX}" y="${centerY + 1.7}">${lot.lot}</text><title>${label}</title>
     </g>`;
   }).join("");
-  return `<div class="map-pan-hint" aria-hidden="true">↔ Deslize o mapa para os lados</div>
+  return `<div class="map-pan-hint" aria-hidden="true">↔ Arraste para os lados · pinça ou roda do mouse para dar zoom</div>
   <div class="cad-map-shell">
-    <div class="cad-map-stage">
-      <img src="assets/planta-dwg.svg" alt="Planta vetorial extraída do projeto DWG" />
-      <svg class="cad-map-overlay" viewBox="${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMin meet" aria-label="Lotes interativos sobre a planta real">
-        ${overlays}
-      </svg>
+    <div class="cad-map-viewport">
+      <div class="cad-map-stage">
+        <img src="assets/planta-dwg.svg" alt="Planta vetorial extraída do projeto DWG" />
+        <svg class="cad-map-overlay" viewBox="${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMin meet" aria-label="Lotes interativos sobre a planta real">
+          ${overlays}
+        </svg>
+      </div>
+      <div class="map-zoom-controls" role="group" aria-label="Zoom do mapa">
+        <button type="button" data-zoom="in" aria-label="Aumentar zoom">+</button>
+        <button type="button" data-zoom="out" aria-label="Diminuir zoom">−</button>
+        <button type="button" data-zoom="reset" aria-label="Restaurar zoom">⤢</button>
+      </div>
     </div>
     <div class="aerial-map-caption"><strong>Planta real do DWG</strong><span>Os polígonos seguem as divisas vetoriais do projeto. O contorno aberto do H-11 foi reconstruído pelas divisas vizinhas; F-1 e G-1 permanecem como marcadores.</span></div>
   </div>`;
@@ -207,6 +232,9 @@ function renderMap() {
   document.querySelector("#blockMapButton").classList.toggle("active", !aerial);
   if (aerial) {
     elements.map.innerHTML = renderAerialMap();
+    const viewport = elements.map.querySelector(".cad-map-viewport");
+    const stage = elements.map.querySelector(".cad-map-stage");
+    if (viewport && stage) aerialZoom.attach(viewport, stage);
     return;
   }
   const visibleIds = new Set(filteredLots().map((lot) => lot.id));
@@ -347,11 +375,24 @@ async function loadAdminData() {
   else if (brokersError || brokerData?.error) showToast("Lotes e reservas carregados; a lista de corretores está temporariamente indisponível.", true);
 }
 
-async function openAdminPanel() {
-  if (!state.isAdmin) return;
-  elements.adminSection.hidden = false;
-  await loadAdminData();
-  elements.adminSection.scrollIntoView({ behavior: "smooth", block: "start" });
+function setPageTab(tab) {
+  state.pageTab = tab;
+  document.querySelectorAll("[data-page-tab]").forEach((button) => {
+    const active = button.dataset.pageTab === tab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  elements.hero.hidden = tab !== "mapa";
+  elements.pageMapa.hidden = tab !== "mapa";
+  elements.pageLotes.hidden = tab !== "lotes";
+  elements.adminSection.hidden = tab !== "administracao";
+}
+
+async function switchPageTab(tab) {
+  if (tab === "administracao" && !state.isAdmin) return;
+  setPageTab(tab);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (tab === "administracao") await loadAdminData();
 }
 
 function openAdminLotEditor(lotId) {
@@ -360,15 +401,10 @@ function openAdminLotEditor(lotId) {
   document.querySelector("#adminLotTitle").textContent = `Editar ${lot.id}`;
   elements.adminLotForm.elements.lotId.value = lot.id;
   elements.adminLotForm.elements.status.value = lot.status;
-  elements.adminLotForm.elements.pricePerM2.value = lot.pricePerM2 ?? "";
-  elements.adminLotForm.elements.totalPrice.value = lot.totalPrice ?? "";
-  elements.adminLotForm.elements.downPayment.value = lot.defaultDownPayment ?? "";
+  adminLotMoney.pricePerM2.setValue(lot.pricePerM2);
+  adminLotMoney.totalPrice.setValue(lot.totalPrice);
+  adminLotMoney.downPayment.setValue(lot.defaultDownPayment);
   elements.adminLotDialog.showModal();
-}
-
-function nullableFormNumber(value) {
-  const text = String(value ?? "").trim();
-  return text === "" ? null : Number(text);
 }
 
 async function saveAdminLot(event) {
@@ -379,9 +415,9 @@ async function saveAdminLot(event) {
   const parameters = {
     p_lot_id: String(data.get("lotId")),
     p_status: String(data.get("status")),
-    p_price_per_m2: nullableFormNumber(data.get("pricePerM2")),
-    p_total_price: nullableFormNumber(data.get("totalPrice")),
-    p_default_down_payment: nullableFormNumber(data.get("downPayment")),
+    p_price_per_m2: adminLotMoney.pricePerM2.getValue(),
+    p_total_price: adminLotMoney.totalPrice.getValue(),
+    p_default_down_payment: adminLotMoney.downPayment.getValue(),
   };
   elements.saveAdminLotButton.disabled = true;
   elements.saveAdminLotButton.textContent = "Salvando...";
@@ -456,11 +492,11 @@ function simulationMarkup(lot) {
   if (lot.totalPrice == null) return `<div class="blocked-note">Este lote aparece na planta, mas ainda não tem preço ou condições cadastradas.</div>`;
   return `<div class="simulator">
     <h4>Simulação rápida</h4>
-    <label><span>Valor da entrada</span><input id="downPaymentInput" type="number" min="0" max="${lot.totalPrice}" step="100" value="${(lot.defaultDownPayment ?? 0).toFixed(2)}" /></label>
+    <label><span>Valor da entrada</span><input id="downPaymentInput" type="text" inputmode="decimal" autocomplete="off" /></label>
     <div class="quick-percentages" aria-label="Atalhos de entrada">
       <button type="button" data-entry-percent="5">5%</button><button type="button" data-entry-percent="10">10%</button><button type="button" data-entry-percent="20">20%</button>
     </div>
-    <label><span>Prazo</span><select id="termSelect">${Object.keys(PLAN_FACTORS).map((term) => `<option value="${term}" ${term === "60" ? "selected" : ""}>${term} meses</option>`).join("")}</select></label>
+    <label><span>Prazo</span><select id="termSelect">${Object.keys(PLAN_FACTORS).map((term) => `<option value="${term}" ${term === "240" ? "selected" : ""}>${term} meses</option>`).join("")}</select></label>
     <div class="simulation-result"><span>Parcela estimada</span><strong id="monthlyPayment">—</strong><small id="simulationMeta"></small></div>
   </div>`;
 }
@@ -486,21 +522,23 @@ function renderPanel() {
 }
 
 function bindSimulator(lot) {
-  const downPayment = document.querySelector("#downPaymentInput");
+  const downPaymentEl = document.querySelector("#downPaymentInput");
+  const downPayment = bindCurrencyInput(downPaymentEl);
+  downPayment.setValue(lot.defaultDownPayment ?? 0);
   const term = document.querySelector("#termSelect");
   const update = () => {
-    const entry = Math.max(0, Math.min(Number(downPayment.value) || 0, lot.totalPrice));
+    const entry = Math.max(0, Math.min(downPayment.getValue() ?? 0, lot.totalPrice));
     const months = Number(term.value);
     const factor = PLAN_FACTORS[months];
     const financed = lot.totalPrice - entry;
     const monthly = (financed / months) * factor;
     document.querySelector("#monthlyPayment").textContent = money.format(monthly);
-    document.querySelector("#simulationMeta").textContent = `${months} meses · saldo ${money.format(financed)} · fator ${number.format(factor)}`;
+    document.querySelector("#simulationMeta").textContent = `${months} meses · saldo ${money.format(financed)}`;
   };
-  downPayment.addEventListener("input", update);
+  downPaymentEl.addEventListener("currencychange", update);
   term.addEventListener("change", update);
   document.querySelectorAll("[data-entry-percent]").forEach((button) => button.addEventListener("click", () => {
-    downPayment.value = (lot.totalPrice * Number(button.dataset.entryPercent) / 100).toFixed(2);
+    downPayment.setValue(lot.totalPrice * Number(button.dataset.entryPercent) / 100);
     update();
   }));
   update();
@@ -556,7 +594,7 @@ async function confirmReservation(event) {
   elements.reservationDialog.close();
   elements.reservationForm.reset();
   await loadLots();
-  showToast(`${lot.id} reservado com sucesso no Supabase.`);
+  showToast(`${lot.id} reservado com sucesso.`);
 }
 
 function showToast(message, isError = false) {
@@ -593,8 +631,8 @@ function buildPrintReport() {
 function friendlyLoginError(error) {
   const message = error?.message?.toLowerCase() ?? "";
   if (message.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
-  if (message.includes("email not confirmed")) return "Este e-mail ainda não foi confirmado no Supabase.";
-  if (message.includes("failed to fetch")) return "Não foi possível conectar ao Supabase. Confira a internet.";
+  if (message.includes("email not confirmed")) return "Este e-mail ainda não foi confirmado no sistema.";
+  if (message.includes("failed to fetch")) return "Não foi possível conectar ao servidor. Confira a internet.";
   return "Não foi possível entrar. Tente novamente.";
 }
 
@@ -608,14 +646,14 @@ function showLogin() {
   state.adminBrokers = [];
   state.adminBrokersError = "";
   elements.adminButton.hidden = true;
-  elements.adminSection.hidden = true;
+  setPageTab("mapa");
   document.body.classList.remove("authenticated");
   elements.loginForm.password.value = "";
   elements.loginForm.email.focus();
 }
 
 async function loadLots() {
-  elements.connectionBadge.textContent = "Sincronizando...";
+  elements.connectionBadge.textContent = "Carregando lotes...";
   elements.connectionBadge.classList.remove("error");
   if (!state.mapGeometry) {
     const geometryResponse = await fetch("data/lot-map.json");
@@ -696,52 +734,23 @@ async function handleLogout() {
   showLogin();
 }
 
-function beginMapTouch(event) {
-  if (state.mapMode !== "aerial" || event.touches.length !== 1) return;
-  const touch = event.touches[0];
-  mapTouch = {
-    startX: touch.clientX,
-    startY: touch.clientY,
-    scrollLeft: elements.map.scrollLeft,
-    dragging: false,
-  };
-}
-
-function moveMapTouch(event) {
-  if (!mapTouch || event.touches.length !== 1) return;
-  const touch = event.touches[0];
-  const deltaX = touch.clientX - mapTouch.startX;
-  const deltaY = touch.clientY - mapTouch.startY;
-
-  if (!mapTouch.dragging) {
-    if (Math.hypot(deltaX, deltaY) < 8) return;
-    if (Math.abs(deltaX) <= Math.abs(deltaY) * 1.1) {
-      mapTouch = null;
+function bindEvents() {
+  elements.map.addEventListener("click", (event) => {
+    if (suppressMapClick) return;
+    const zoomButton = event.target.closest("[data-zoom]");
+    if (zoomButton) {
+      if (zoomButton.dataset.zoom === "in") aerialZoom.zoomIn();
+      else if (zoomButton.dataset.zoom === "out") aerialZoom.zoomOut();
+      else aerialZoom.reset();
       return;
     }
-    mapTouch.dragging = true;
-  }
-
-  event.preventDefault();
-  elements.map.scrollLeft = mapTouch.scrollLeft - deltaX;
-}
-
-function endMapTouch() {
-  if (mapTouch?.dragging) {
-    suppressMapClick = true;
-    window.setTimeout(() => { suppressMapClick = false; }, 400);
-  }
-  mapTouch = null;
-}
-
-function bindEvents() {
-  elements.map.addEventListener("click", (event) => { if (suppressMapClick) return; const button = event.target.closest("[data-lot-id]"); if (button && !button.classList.contains("filtered-out")) selectLot(button.dataset.lotId, true); });
-  elements.map.addEventListener("touchstart", beginMapTouch, { passive: true });
-  elements.map.addEventListener("touchmove", moveMapTouch, { passive: false });
-  elements.map.addEventListener("touchend", endMapTouch, { passive: true });
-  elements.map.addEventListener("touchcancel", endMapTouch, { passive: true });
+    const button = event.target.closest("[data-lot-id]");
+    if (button && !button.classList.contains("filtered-out")) selectLot(button.dataset.lotId, true);
+  });
   elements.map.addEventListener("keydown", (event) => { const lot = event.target.closest("[data-lot-id]"); if (lot && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectLot(lot.dataset.lotId, true); } });
-  elements.table.addEventListener("click", (event) => { const button = event.target.closest("[data-lot-id]"); if (button) { selectLot(button.dataset.lotId); document.querySelector("#mapa").scrollIntoView({ behavior: "smooth" }); } });
+  elements.table.addEventListener("click", (event) => { const button = event.target.closest("[data-lot-id]"); if (button) { switchPageTab("mapa"); selectLot(button.dataset.lotId); } });
+  document.querySelector(".brand").addEventListener("click", (event) => { event.preventDefault(); switchPageTab("mapa"); });
+  document.querySelectorAll("[data-page-tab]").forEach((button) => button.addEventListener("click", () => switchPageTab(button.dataset.pageTab)));
   elements.search.addEventListener("input", () => { state.query = elements.search.value; refresh(); });
   elements.block.addEventListener("change", () => { state.block = elements.block.value; refresh(); });
   elements.status.addEventListener("change", () => { state.status = elements.status.value; refresh(); });
@@ -753,7 +762,6 @@ function bindEvents() {
   document.querySelector("#openTechnicalMap").addEventListener("click", () => elements.technicalDialog.showModal());
   document.querySelector("#closeTechnicalMap").addEventListener("click", () => elements.technicalDialog.close());
   elements.reservationForm.addEventListener("submit", confirmReservation);
-  elements.adminButton.addEventListener("click", openAdminPanel);
   document.querySelector("#refreshAdmin").addEventListener("click", loadAdminData);
   document.querySelectorAll("[data-admin-tab]").forEach((button) => button.addEventListener("click", () => switchAdminTab(button.dataset.adminTab)));
   elements.adminLotSearch.addEventListener("input", renderAdminLots);
@@ -771,6 +779,7 @@ function bindEvents() {
 async function init() {
   BLOCKS.forEach((block) => elements.block.insertAdjacentHTML("beforeend", `<option value="${block}">Quadra ${block}</option>`));
   bindEvents();
+  setPageTab("mapa");
 
   try {
     if (!config.supabaseUrl || !config.supabasePublishableKey?.startsWith("sb_publishable_")) {
@@ -790,7 +799,7 @@ async function init() {
     });
   } catch (error) {
     elements.loginError.textContent = error.message.includes("Configuração")
-      ? "A conexão pública do Supabase ainda não foi configurada."
+      ? "A conexão com o sistema ainda não foi configurada."
       : "Não foi possível iniciar a conexão. Confira a internet e atualize a página.";
   }
 }

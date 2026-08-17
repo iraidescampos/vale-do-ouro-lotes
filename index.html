@@ -24,7 +24,7 @@
         <span class="brand-mark login-mark">VO</span>
         <p class="eyebrow">Acesso dos corretores</p>
         <h1 id="loginTitle">Entre na Central de Vendas</h1>
-        <p class="login-intro">Use o e-mail e a senha cadastrados no Supabase.</p>
+        <p class="login-intro">Use o e-mail e a senha cadastrados pelo administrador.</p>
         <label>
           <span>E-mail</span>
           <input name="email" type="email" autocomplete="username" required />
@@ -48,10 +48,13 @@
         </span>
       </a>
       <nav class="main-nav" aria-label="Navegação principal">
-        <a href="#mapa">Mapa</a>
-        <a href="#lotes">Lotes</a>
+        <div class="page-tabs" role="tablist" aria-label="Seções do site">
+          <button type="button" class="active" data-page-tab="mapa" role="tab" aria-selected="true">Mapa</button>
+          <button type="button" data-page-tab="lotes" role="tab" aria-selected="false">Lotes</button>
+          <button type="button" id="openAdminPanel" data-page-tab="administracao" role="tab" aria-selected="false" hidden>Administração</button>
+        </div>
+        <a class="nav-button" href="publico.html">Reservar sem corretor</a>
         <button class="nav-button" id="openTechnicalMap" type="button">Planta técnica</button>
-        <button class="nav-button admin-nav-button" id="openAdminPanel" type="button" hidden>Administração</button>
       </nav>
       <div class="session-area" id="sessionArea">
         <span class="connection-badge" id="connectionBadge">Conectando...</span>
@@ -83,7 +86,7 @@
             <p class="eyebrow">Implantação comercial interativa</p>
             <h2 id="mapTitle">Escolha o lote pela localização</h2>
           </div>
-          <p class="section-note">A vista aérea acompanha a orientação da planta técnica; as cores vêm do Supabase.</p>
+          <p class="section-note">A vista aérea acompanha a orientação da planta técnica.</p>
         </div>
 
         <div class="toolbar" aria-label="Filtros do mapa">
@@ -296,9 +299,9 @@
         <p class="technical-note">Ao alterar um lote reservado, a reserva ativa será convertida em venda ou cancelada, conforme a nova situação.</p>
         <label><span>Situação</span><select name="status" required><option value="disponivel">Disponível</option><option value="reservado">Reservado (reserva ativa)</option><option value="vendido">Vendido</option><option value="indisponivel">Indisponível</option><option value="sem_cadastro">Cadastro pendente</option></select></label>
         <div class="admin-form-grid">
-          <label><span>Valor por m²</span><input name="pricePerM2" type="number" min="0" step="0.01" /></label>
-          <label><span>Valor do lote</span><input name="totalPrice" type="number" min="0" step="0.01" /></label>
-          <label><span>Entrada padrão</span><input name="downPayment" type="number" min="0" step="0.01" /></label>
+          <label><span>Valor por m²</span><input name="pricePerM2" type="text" inputmode="decimal" autocomplete="off" /></label>
+          <label><span>Valor do lote</span><input name="totalPrice" type="text" inputmode="decimal" autocomplete="off" /></label>
+          <label><span>Entrada padrão</span><input name="downPayment" type="text" inputmode="decimal" autocomplete="off" /></label>
         </div>
         <div class="modal-actions">
           <button class="button button-ghost" value="cancel" formnovalidate>Cancelar</button>
