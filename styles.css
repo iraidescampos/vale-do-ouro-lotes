@@ -105,8 +105,9 @@ input:focus, select:focus { border-color: var(--forest-2); box-shadow: 0 0 0 3px
 .map-view-switch span { margin-left: auto; padding-right: 8px; color: var(--muted); font-size: .76rem; }
 
 .map-and-detail { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 20px; align-items: start; }
-.commercial-map { position: relative; min-height: 680px; overflow: auto; padding: 42px; border-radius: 24px; color: #fff; background: linear-gradient(160deg, #1c4338, #0e2b24); box-shadow: var(--shadow); }
+.commercial-map { position: relative; min-height: 680px; overflow: auto; padding: 42px; border-radius: 24px; color: #fff; background: linear-gradient(160deg, #1c4338, #0e2b24); box-shadow: var(--shadow); overscroll-behavior: contain; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; }
 .commercial-map::before { content: ""; position: absolute; inset: 0; opacity: .16; background-image: linear-gradient(rgb(255 255 255 / .16) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .16) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
+.commercial-map:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .commercial-map.aerial-active { height: min(76vh, 760px); min-height: 620px; padding: 18px; color: var(--ink); background: #dfe7e1; }
 .commercial-map.aerial-active::before { display: none; }
 .aerial-map-shell { min-width: 1120px; overflow: hidden; border-radius: 20px; background: #f7f8f4; }
@@ -132,11 +133,12 @@ input:focus, select:focus { border-color: var(--forest-2); box-shadow: 0 0 0 3px
 .aerial-lot.filtered-out { opacity: .13; pointer-events: none; }
 .aerial-map-caption { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-top: 1px solid var(--line); color: var(--muted); background: #fff; font-size: .76rem; }
 .aerial-map-caption strong { color: var(--forest); white-space: nowrap; }
-.cad-map-shell { width: 100%; overflow: hidden; border-radius: 20px; background: #fff; box-shadow: 0 10px 30px rgb(18 56 47 / .08); }
-.cad-map-stage { position: relative; width: max(100%, 720px); aspect-ratio: 955.571840772405 / 1172.78196753934; overflow: hidden; background: #fff; }
+.cad-map-shell { width: max(100%, 720px); overflow: hidden; border-radius: 20px; background: #fff; box-shadow: 0 10px 30px rgb(18 56 47 / .08); }
+.cad-map-stage { position: relative; width: 100%; aspect-ratio: 955.571840772405 / 1172.78196753934; overflow: hidden; background: #fff; }
 .cad-map-stage > img, .cad-map-overlay { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 .cad-map-stage > img { object-fit: contain; object-position: left top; pointer-events: none; }
 .cad-map-overlay { z-index: 2; }
+.map-pan-hint { display: none; }
 .cad-lot { cursor: pointer; outline: none; }
 .cad-lot polygon, .cad-lot circle { fill: var(--available); fill-opacity: .68; stroke: #fff; stroke-width: 1.1; vector-effect: non-scaling-stroke; transition: fill-opacity .16s ease, stroke-width .16s ease, opacity .16s ease; }
 .cad-lot text { fill: #fff; font-size: 4.8px; font-weight: 900; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: rgb(18 56 47 / .46); stroke-width: .65px; }
@@ -296,6 +298,9 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px
   .commercial-map { padding: 26px 18px; min-height: 620px; }
   .commercial-map.aerial-active { padding: 10px; }
   .commercial-map.aerial-active { height: 620px; }
+  .commercial-map.aerial-active .cad-map-shell { width: 900px; }
+  .commercial-map.aerial-active .map-pan-hint { position: sticky; top: 0; left: 0; z-index: 5; display: block; width: max-content; margin: 0 0 8px; padding: 8px 12px; border-radius: 999px; color: #fff; background: rgb(12 40 33 / .88); box-shadow: 0 5px 16px rgb(0 0 0 / .18); font-size: .74rem; font-weight: 800; pointer-events: none; }
+  .cad-map-overlay { touch-action: pan-x pan-y; }
   .aerial-map-caption { align-items: flex-start; flex-direction: column; gap: 3px; }
   .technical-gallery { grid-template-columns: 1fr; }
   .technical-gallery figure.wide { grid-column: auto; }

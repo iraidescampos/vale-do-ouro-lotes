@@ -186,7 +186,8 @@ function renderAerialMap() {
       <polygon points="${points}"></polygon><text x="${centerX}" y="${centerY + 1.7}">${lot.lot}</text><title>${label}</title>
     </g>`;
   }).join("");
-  return `<div class="cad-map-shell">
+  return `<div class="map-pan-hint" aria-hidden="true">↔ Deslize o mapa para os lados</div>
+  <div class="cad-map-shell">
     <div class="cad-map-stage">
       <img src="assets/planta-dwg.svg" alt="Planta vetorial extraída do projeto DWG" />
       <svg class="cad-map-overlay" viewBox="${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}" preserveAspectRatio="xMinYMin meet" aria-label="Lotes interativos sobre a planta real">
