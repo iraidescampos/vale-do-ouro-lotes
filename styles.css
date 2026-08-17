@@ -297,10 +297,10 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px
   .map-view-switch span { width: 100%; margin: 3px 0 0; padding: 0 7px 4px; }
   .commercial-map { padding: 26px 18px; min-height: 620px; }
   .commercial-map.aerial-active { padding: 10px; }
-  .commercial-map.aerial-active { height: 620px; }
+  .commercial-map.aerial-active { height: 620px; touch-action: pan-y; }
   .commercial-map.aerial-active .cad-map-shell { width: 900px; }
   .commercial-map.aerial-active .map-pan-hint { position: sticky; top: 0; left: 0; z-index: 5; display: block; width: max-content; margin: 0 0 8px; padding: 8px 12px; border-radius: 999px; color: #fff; background: rgb(12 40 33 / .88); box-shadow: 0 5px 16px rgb(0 0 0 / .18); font-size: .74rem; font-weight: 800; pointer-events: none; }
-  .cad-map-overlay { touch-action: pan-x pan-y; }
+  .cad-map-overlay { touch-action: pan-y; }
   .aerial-map-caption { align-items: flex-start; flex-direction: column; gap: 3px; }
   .technical-gallery { grid-template-columns: 1fr; }
   .technical-gallery figure.wide { grid-column: auto; }

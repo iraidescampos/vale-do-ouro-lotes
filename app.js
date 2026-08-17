@@ -14,6 +14,8 @@ const config = window.VALE_CONFIG ?? {};
 
 const state = { lots: [], mapGeometry: null, lotMeasurements: null, selectedId: null, query: "", block: "all", status: "all", session: null, mapMode: "aerial", isAdmin: false, adminReservations: [], adminHistory: [], adminBrokers: [], adminBrokersError: "", adminTab: "lots" };
 let supabase;
+let mapTouch = null;
+let suppressMapClick = false;
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
@@ -694,8 +696,50 @@ async function handleLogout() {
   showLogin();
 }
 
+function beginMapTouch(event) {
+  if (state.mapMode !== "aerial" || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  mapTouch = {
+    startX: touch.clientX,
+    startY: touch.clientY,
+    scrollLeft: elements.map.scrollLeft,
+    dragging: false,
+  };
+}
+
+function moveMapTouch(event) {
+  if (!mapTouch || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  const deltaX = touch.clientX - mapTouch.startX;
+  const deltaY = touch.clientY - mapTouch.startY;
+
+  if (!mapTouch.dragging) {
+    if (Math.hypot(deltaX, deltaY) < 8) return;
+    if (Math.abs(deltaX) <= Math.abs(deltaY) * 1.1) {
+      mapTouch = null;
+      return;
+    }
+    mapTouch.dragging = true;
+  }
+
+  event.preventDefault();
+  elements.map.scrollLeft = mapTouch.scrollLeft - deltaX;
+}
+
+function endMapTouch() {
+  if (mapTouch?.dragging) {
+    suppressMapClick = true;
+    window.setTimeout(() => { suppressMapClick = false; }, 400);
+  }
+  mapTouch = null;
+}
+
 function bindEvents() {
-  elements.map.addEventListener("click", (event) => { const button = event.target.closest("[data-lot-id]"); if (button && !button.classList.contains("filtered-out")) selectLot(button.dataset.lotId, true); });
+  elements.map.addEventListener("click", (event) => { if (suppressMapClick) return; const button = event.target.closest("[data-lot-id]"); if (button && !button.classList.contains("filtered-out")) selectLot(button.dataset.lotId, true); });
+  elements.map.addEventListener("touchstart", beginMapTouch, { passive: true });
+  elements.map.addEventListener("touchmove", moveMapTouch, { passive: false });
+  elements.map.addEventListener("touchend", endMapTouch, { passive: true });
+  elements.map.addEventListener("touchcancel", endMapTouch, { passive: true });
   elements.map.addEventListener("keydown", (event) => { const lot = event.target.closest("[data-lot-id]"); if (lot && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectLot(lot.dataset.lotId, true); } });
   elements.table.addEventListener("click", (event) => { const button = event.target.closest("[data-lot-id]"); if (button) { selectLot(button.dataset.lotId); document.querySelector("#mapa").scrollIntoView({ behavior: "smooth" }); } });
   elements.search.addEventListener("input", () => { state.query = elements.search.value; refresh(); });
