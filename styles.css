@@ -247,6 +247,7 @@ tbody tr:hover { background: #fafbf8; }
 .broker-list-heading strong { display: grid; place-items: center; min-width: 46px; height: 46px; border-radius: 14px; color: #fff; background: var(--forest); font-family: "Fraunces", serif; font-size: 1.4rem; }
 .access-pill { display: inline-flex; padding: 6px 9px; border-radius: 999px; color: var(--forest); background: #e8f0eb; font-size: .7rem; font-weight: 800; }
 .access-pill.admin { color: #fff; background: var(--forest); }
+.table-error { color: #963e37; white-space: normal; }
 
 footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px clamp(20px, 5vw, 72px); color: #b8cbc5; background: #0c2821; font-size: .82rem; }
 

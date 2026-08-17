@@ -12,7 +12,7 @@ const PLAN_FACTORS = { 12: 1, 24: 1.07, 36: 1.11, 48: 1.15, 60: 1.19, 120: 1.4, 
 const BLOCKS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"];
 const config = window.VALE_CONFIG ?? {};
 
-const state = { lots: [], mapGeometry: null, lotMeasurements: null, selectedId: null, query: "", block: "all", status: "all", session: null, mapMode: "aerial", isAdmin: false, adminReservations: [], adminHistory: [], adminBrokers: [], adminTab: "lots" };
+const state = { lots: [], mapGeometry: null, lotMeasurements: null, selectedId: null, query: "", block: "all", status: "all", session: null, mapMode: "aerial", isAdmin: false, adminReservations: [], adminHistory: [], adminBrokers: [], adminBrokersError: "", adminTab: "lots" };
 let supabase;
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -285,6 +285,10 @@ function renderAdminReservations() {
 
 function renderAdminBrokers() {
   elements.brokerCount.textContent = state.adminBrokers.length;
+  if (state.adminBrokersError) {
+    elements.adminBrokersTable.innerHTML = `<tr><td colspan="5" class="table-error">${escapeHtml(state.adminBrokersError)}</td></tr>`;
+    return;
+  }
   elements.adminBrokersTable.innerHTML = state.adminBrokers.length ? state.adminBrokers.map((broker) => `<tr>
     <td><strong>${escapeHtml(broker.name || "Sem nome")}</strong></td>
     <td>${escapeHtml(broker.email)}</td>
@@ -326,14 +330,18 @@ async function loadAdminData() {
     supabase.rpc("admin_list_audit", { p_limit: 200 }),
     supabase.functions.invoke("manage-brokers", { body: { action: "list" } }),
   ]);
-  if (reservationsError || historyError || brokersError || brokerData?.error) {
-    showToast("Não foi possível carregar os dados administrativos.", true);
-    return;
+  state.adminReservations = reservationsError ? [] : reservations ?? [];
+  state.adminHistory = historyError ? [] : history ?? [];
+  if (brokersError || brokerData?.error) {
+    state.adminBrokers = [];
+    state.adminBrokersError = "Não foi possível carregar os usuários. Atualize a página e tente novamente.";
+  } else {
+    state.adminBrokers = brokerData?.brokers ?? [];
+    state.adminBrokersError = "";
   }
-  state.adminReservations = reservations ?? [];
-  state.adminHistory = history ?? [];
-  state.adminBrokers = brokerData?.brokers ?? [];
   renderAdmin();
+  if (reservationsError || historyError) showToast("Parte dos dados administrativos não pôde ser carregada.", true);
+  else if (brokersError || brokerData?.error) showToast("Lotes e reservas carregados; a lista de corretores está temporariamente indisponível.", true);
 }
 
 async function openAdminPanel() {
@@ -428,7 +436,11 @@ async function createBroker(event) {
   elements.createBrokerButton.disabled = false;
   elements.createBrokerButton.textContent = "Criar corretor";
   if (error || data?.error) {
-    elements.brokerError.textContent = data?.error || "Não foi possível criar o corretor. Confira os dados e tente novamente.";
+    let message = data?.error;
+    if (!message && error?.context?.json) {
+      try { message = (await error.context.json())?.error; } catch { /* A resposta sem JSON usa a mensagem padrão abaixo. */ }
+    }
+    elements.brokerError.textContent = message || "Não foi possível criar o corretor. Confira os dados e tente novamente.";
     return;
   }
   elements.brokerForm.reset();
@@ -591,6 +603,7 @@ function showLogin() {
   state.adminReservations = [];
   state.adminHistory = [];
   state.adminBrokers = [];
+  state.adminBrokersError = "";
   elements.adminButton.hidden = true;
   elements.adminSection.hidden = true;
   document.body.classList.remove("authenticated");
