@@ -234,6 +234,19 @@ tbody tr:hover { background: #fafbf8; }
 .reservation-pill.cancelada, .reservation-pill.expirada { background: var(--unavailable); }
 .admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .admin-form-grid label:last-child { grid-column: 1 / -1; }
+.broker-management-grid { display: grid; grid-template-columns: minmax(300px, .72fr) minmax(560px, 1.28fr); gap: 16px; align-items: start; }
+.admin-create-form, .broker-list-card { padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 12px 34px rgb(18 56 47 / .06); }
+.admin-create-form { display: grid; gap: 14px; }
+.admin-create-form h3, .broker-list-heading h3 { margin: 0; font-size: 1.55rem; }
+.admin-create-form > div:first-child > p:not(.eyebrow) { margin: 8px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.5; }
+.show-password-option { display: flex !important; grid-template-columns: auto 1fr; align-items: center; justify-content: start; gap: 8px; }
+.show-password-option input { width: 18px; height: 18px; }
+.broker-form-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.broker-form-actions .button { flex: 1; }
+.broker-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+.broker-list-heading strong { display: grid; place-items: center; min-width: 46px; height: 46px; border-radius: 14px; color: #fff; background: var(--forest); font-family: "Fraunces", serif; font-size: 1.4rem; }
+.access-pill { display: inline-flex; padding: 6px 9px; border-radius: 999px; color: var(--forest); background: #e8f0eb; font-size: .7rem; font-weight: 800; }
+.access-pill.admin { color: #fff; background: var(--forest); }
 
 footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px clamp(20px, 5vw, 72px); color: #b8cbc5; background: #0c2821; font-size: .82rem; }
 
@@ -264,6 +277,7 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px
   .lot-panel { position: relative; top: auto; }
   .toolbar { grid-template-columns: 1fr 1fr; }
   .admin-summary { grid-template-columns: 1fr 1fr; }
+  .broker-management-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
   .site-header { gap: 10px; }
@@ -288,6 +302,7 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px
   .admin-toolbar, .admin-form-grid { grid-template-columns: 1fr; }
   .admin-form-grid label:last-child { grid-column: auto; }
   .admin-tabs .admin-refresh { width: 100%; margin-left: 0; }
+  .broker-form-actions { flex-direction: column; }
   footer { flex-direction: column; }
 }
 

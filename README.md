@@ -12,6 +12,7 @@ Sistema de consulta comercial dos lotes, preparado como site estático para o Gi
 - login individual dos corretores por e-mail e senha;
 - leitura dos 110 lotes diretamente do Supabase;
 - reserva atômica no banco, evitando que dois corretores reservem o mesmo lote;
+- cadastro seguro de novos corretores pelo painel administrativo;
 - exportação da lista filtrada para Excel;
 - relatório em PDF pela janela de impressão do navegador;
 - recortes da planta técnica para conferência visual;

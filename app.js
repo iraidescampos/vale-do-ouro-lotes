@@ -6,13 +6,13 @@ const STATUS = {
   sem_cadastro: "Cadastro pendente",
 };
 const RESERVATION_STATUS = { ativa: "Ativa", convertida: "Convertida em venda", cancelada: "Cancelada", expirada: "Expirada" };
-const ADMIN_ACTION = { reserva_criada: "Reserva criada", reserva_cancelada: "Reserva cancelada", lote_atualizado: "Lote atualizado" };
+const ADMIN_ACTION = { reserva_criada: "Reserva criada", reserva_cancelada: "Reserva cancelada", lote_atualizado: "Lote atualizado", corretor_criado: "Corretor criado" };
 
 const PLAN_FACTORS = { 12: 1, 24: 1.07, 36: 1.11, 48: 1.15, 60: 1.19, 120: 1.4, 150: 1.51, 180: 1.63, 210: 1.75, 240: 1.88 };
 const BLOCKS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"];
 const config = window.VALE_CONFIG ?? {};
 
-const state = { lots: [], mapGeometry: null, lotMeasurements: null, selectedId: null, query: "", block: "all", status: "all", session: null, mapMode: "aerial", isAdmin: false, adminReservations: [], adminHistory: [], adminTab: "lots" };
+const state = { lots: [], mapGeometry: null, lotMeasurements: null, selectedId: null, query: "", block: "all", status: "all", session: null, mapMode: "aerial", isAdmin: false, adminReservations: [], adminHistory: [], adminBrokers: [], adminTab: "lots" };
 let supabase;
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -44,6 +44,12 @@ const elements = {
   adminSummary: document.querySelector("#adminSummary"),
   adminLotsTable: document.querySelector("#adminLotsTableBody"),
   adminReservationsTable: document.querySelector("#adminReservationsTableBody"),
+  adminBrokersTable: document.querySelector("#adminBrokersTableBody"),
+  brokerCount: document.querySelector("#brokerCount"),
+  brokerForm: document.querySelector("#brokerForm"),
+  brokerError: document.querySelector("#brokerError"),
+  createBrokerButton: document.querySelector("#createBrokerButton"),
+  showBrokerPassword: document.querySelector("#showBrokerPassword"),
   adminHistoryTable: document.querySelector("#adminHistoryTableBody"),
   adminLotSearch: document.querySelector("#adminLotSearch"),
   adminLotStatus: document.querySelector("#adminLotStatus"),
@@ -230,7 +236,12 @@ function adminAuditDetails(entry) {
     return `${from} → ${to}`;
   }
   if (entry.action === "reserva_criada" && entry.details?.duration_hours) return `Validade: ${entry.details.duration_hours} hora(s)`;
+  if (entry.action === "corretor_criado") return `${entry.details?.name ?? "Corretor"} · ${entry.details?.email ?? "—"}`;
   return "—";
+}
+
+function optionalDateTime(value) {
+  return value ? dateTime.format(new Date(value)) : "Ainda não entrou";
 }
 
 function renderAdminSummary() {
@@ -272,6 +283,17 @@ function renderAdminReservations() {
   </tr>`).join("") : `<tr><td colspan="8">Ainda não existem reservas.</td></tr>`;
 }
 
+function renderAdminBrokers() {
+  elements.brokerCount.textContent = state.adminBrokers.length;
+  elements.adminBrokersTable.innerHTML = state.adminBrokers.length ? state.adminBrokers.map((broker) => `<tr>
+    <td><strong>${escapeHtml(broker.name || "Sem nome")}</strong></td>
+    <td>${escapeHtml(broker.email)}</td>
+    <td><span class="access-pill ${broker.isAdmin ? "admin" : "broker"}">${broker.isAdmin ? "Administrador" : "Corretor"}</span></td>
+    <td>${optionalDateTime(broker.createdAt)}</td>
+    <td>${optionalDateTime(broker.lastSignInAt)}</td>
+  </tr>`).join("") : `<tr><td colspan="5">Nenhum usuário cadastrado.</td></tr>`;
+}
+
 function renderAdminHistory() {
   elements.adminHistoryTable.innerHTML = state.adminHistory.length ? state.adminHistory.map((entry) => `<tr>
     <td>${dateTime.format(new Date(entry.created_at))}</td>
@@ -287,6 +309,7 @@ function renderAdmin() {
   renderAdminSummary();
   renderAdminLots();
   renderAdminReservations();
+  renderAdminBrokers();
   renderAdminHistory();
 }
 
@@ -298,16 +321,18 @@ function switchAdminTab(tab) {
 
 async function loadAdminData() {
   if (!state.isAdmin) return;
-  const [{ data: reservations, error: reservationsError }, { data: history, error: historyError }] = await Promise.all([
+  const [{ data: reservations, error: reservationsError }, { data: history, error: historyError }, { data: brokerData, error: brokersError }] = await Promise.all([
     supabase.rpc("admin_list_reservations"),
     supabase.rpc("admin_list_audit", { p_limit: 200 }),
+    supabase.functions.invoke("manage-brokers", { body: { action: "list" } }),
   ]);
-  if (reservationsError || historyError) {
+  if (reservationsError || historyError || brokersError || brokerData?.error) {
     showToast("Não foi possível carregar os dados administrativos.", true);
     return;
   }
   state.adminReservations = reservations ?? [];
   state.adminHistory = history ?? [];
+  state.adminBrokers = brokerData?.brokers ?? [];
   renderAdmin();
 }
 
@@ -366,6 +391,50 @@ async function cancelAdminReservation(reservationId, lotId) {
   await loadLots();
   await loadAdminData();
   showToast(`Reserva do ${lotId} cancelada; o lote voltou a ficar disponível.`);
+}
+
+function generateTemporaryPassword() {
+  const groups = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnopqrstuvwxyz", "23456789", "!@#$%&*"];
+  const randomFrom = (characters) => characters[crypto.getRandomValues(new Uint32Array(1))[0] % characters.length];
+  const passwordCharacters = groups.map(randomFrom);
+  const allCharacters = groups.join("");
+  while (passwordCharacters.length < 16) passwordCharacters.push(randomFrom(allCharacters));
+  for (let index = passwordCharacters.length - 1; index > 0; index -= 1) {
+    const target = crypto.getRandomValues(new Uint32Array(1))[0] % (index + 1);
+    [passwordCharacters[index], passwordCharacters[target]] = [passwordCharacters[target], passwordCharacters[index]];
+  }
+  const field = elements.brokerForm.elements.password;
+  field.value = passwordCharacters.join("");
+  field.type = "text";
+  elements.showBrokerPassword.checked = true;
+  field.focus();
+  field.select();
+}
+
+async function createBroker(event) {
+  event.preventDefault();
+  if (!state.isAdmin || !elements.brokerForm.reportValidity()) return;
+  const form = new FormData(elements.brokerForm);
+  const payload = {
+    action: "create",
+    name: String(form.get("name") ?? "").trim(),
+    email: String(form.get("email") ?? "").trim().toLowerCase(),
+    password: String(form.get("password") ?? ""),
+  };
+  elements.brokerError.textContent = "";
+  elements.createBrokerButton.disabled = true;
+  elements.createBrokerButton.textContent = "Criando...";
+  const { data, error } = await supabase.functions.invoke("manage-brokers", { body: payload });
+  elements.createBrokerButton.disabled = false;
+  elements.createBrokerButton.textContent = "Criar corretor";
+  if (error || data?.error) {
+    elements.brokerError.textContent = data?.error || "Não foi possível criar o corretor. Confira os dados e tente novamente.";
+    return;
+  }
+  elements.brokerForm.reset();
+  elements.brokerForm.elements.password.type = "password";
+  await loadAdminData();
+  showToast(`${payload.name} já pode entrar no sistema com o e-mail cadastrado.`);
 }
 
 function simulationMarkup(lot) {
@@ -521,6 +590,7 @@ function showLogin() {
   state.isAdmin = false;
   state.adminReservations = [];
   state.adminHistory = [];
+  state.adminBrokers = [];
   elements.adminButton.hidden = true;
   elements.adminSection.hidden = true;
   document.body.classList.remove("authenticated");
@@ -633,6 +703,9 @@ function bindEvents() {
   elements.adminLotsTable.addEventListener("click", (event) => { const button = event.target.closest("[data-admin-edit-lot]"); if (button) openAdminLotEditor(button.dataset.adminEditLot); });
   elements.adminReservationsTable.addEventListener("click", (event) => { const button = event.target.closest("[data-admin-cancel-reservation]"); if (button) cancelAdminReservation(button.dataset.adminCancelReservation, button.dataset.lotId); });
   elements.adminLotForm.addEventListener("submit", saveAdminLot);
+  elements.brokerForm.addEventListener("submit", createBroker);
+  document.querySelector("#generateBrokerPassword").addEventListener("click", generateTemporaryPassword);
+  elements.showBrokerPassword.addEventListener("change", () => { elements.brokerForm.elements.password.type = elements.showBrokerPassword.checked ? "text" : "password"; });
   elements.loginForm.addEventListener("submit", handleLogin);
   elements.logoutButton.addEventListener("click", handleLogout);
 }

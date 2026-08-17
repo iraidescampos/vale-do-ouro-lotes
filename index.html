@@ -169,12 +169,13 @@
             <p class="eyebrow">Acesso restrito</p>
             <h2 id="adminTitle">Painel administrativo</h2>
           </div>
-          <p class="section-note">Gerencie lotes e reservas. Todas as alterações ficam registradas no histórico.</p>
+          <p class="section-note">Gerencie lotes, reservas e acessos dos corretores. Todas as alterações ficam registradas no histórico.</p>
         </div>
         <div class="admin-summary" id="adminSummary"></div>
         <div class="admin-tabs" role="tablist" aria-label="Áreas administrativas">
           <button class="active" type="button" data-admin-tab="lots">Lotes</button>
           <button type="button" data-admin-tab="reservations">Reservas</button>
+          <button type="button" data-admin-tab="brokers">Corretores</button>
           <button type="button" data-admin-tab="history">Histórico</button>
           <button class="admin-refresh" id="refreshAdmin" type="button">Atualizar dados</button>
         </div>
@@ -189,6 +190,36 @@
 
         <div class="admin-tab-panel" data-admin-panel="reservations" hidden>
           <div class="table-shell admin-table-shell"><table><thead><tr><th>Lote</th><th>Cliente</th><th>Telefone</th><th>Corretor</th><th>Criada em</th><th>Validade</th><th>Situação</th><th></th></tr></thead><tbody id="adminReservationsTableBody"></tbody></table></div>
+        </div>
+
+        <div class="admin-tab-panel" data-admin-panel="brokers" hidden>
+          <div class="broker-management-grid">
+            <form class="admin-create-form" id="brokerForm">
+              <div>
+                <p class="eyebrow">Novo acesso</p>
+                <h3>Cadastrar corretor</h3>
+                <p>Crie uma senha temporária e envie ao corretor por um canal seguro.</p>
+              </div>
+              <label><span>Nome do corretor</span><input name="name" required minlength="2" maxlength="120" autocomplete="name" /></label>
+              <label><span>E-mail de acesso</span><input name="email" type="email" required maxlength="254" autocomplete="email" /></label>
+              <label><span>Senha temporária</span><input name="password" type="password" required minlength="10" maxlength="72" autocomplete="new-password" /></label>
+              <label class="show-password-option"><input id="showBrokerPassword" type="checkbox" /> <span>Mostrar senha</span></label>
+              <div class="broker-form-actions">
+                <button class="button button-ghost" id="generateBrokerPassword" type="button">Gerar senha segura</button>
+                <button class="button button-primary" id="createBrokerButton" type="submit">Criar corretor</button>
+              </div>
+              <p class="form-error" id="brokerError" role="alert"></p>
+              <small>A senha deve ter ao menos 10 caracteres, com letra maiúscula, minúscula e número.</small>
+            </form>
+
+            <section class="broker-list-card">
+              <div class="broker-list-heading">
+                <div><p class="eyebrow">Acessos cadastrados</p><h3>Usuários do sistema</h3></div>
+                <strong id="brokerCount">0</strong>
+              </div>
+              <div class="table-shell admin-table-shell"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Cadastrado em</th><th>Último acesso</th></tr></thead><tbody id="adminBrokersTableBody"></tbody></table></div>
+            </section>
+          </div>
         </div>
 
         <div class="admin-tab-panel" data-admin-panel="history" hidden>
