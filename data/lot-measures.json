@@ -1,0 +1,874 @@
+{
+  "source": "MEDIDAS LOTES - LOTEAMENTO VALE DO OURO.xlsx",
+  "count": 98,
+  "lots": [
+    {
+      "id": "A-1",
+      "frontM": 10.07,
+      "backM": 20.13,
+      "leftM": 22.44,
+      "rightM": 12.29,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 15.13
+        }
+      ]
+    },
+    {
+      "id": "B-1",
+      "frontM": 9.64,
+      "backM": 21.78,
+      "leftM": 29.19,
+      "rightM": 36.93,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 13.15
+        }
+      ]
+    },
+    {
+      "id": "B-2",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.93,
+      "rightM": 36.87,
+      "additionalSides": []
+    },
+    {
+      "id": "B-3",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.87,
+      "rightM": 36.81,
+      "additionalSides": []
+    },
+    {
+      "id": "B-4",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.81,
+      "rightM": 36.75,
+      "additionalSides": []
+    },
+    {
+      "id": "B-5",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.75,
+      "rightM": 36.69,
+      "additionalSides": []
+    },
+    {
+      "id": "B-6",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.69,
+      "rightM": 36.63,
+      "additionalSides": []
+    },
+    {
+      "id": "B-7",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.63,
+      "rightM": 36.57,
+      "additionalSides": []
+    },
+    {
+      "id": "B-8",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.57,
+      "rightM": 36.51,
+      "additionalSides": []
+    },
+    {
+      "id": "B-9",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.51,
+      "rightM": 36.45,
+      "additionalSides": []
+    },
+    {
+      "id": "B-10",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.45,
+      "rightM": 36.39,
+      "additionalSides": []
+    },
+    {
+      "id": "B-11",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.39,
+      "rightM": 36.33,
+      "additionalSides": []
+    },
+    {
+      "id": "B-12",
+      "frontM": 12.65,
+      "backM": 21.78,
+      "leftM": 36.33,
+      "rightM": 27.27,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.09
+        }
+      ]
+    },
+    {
+      "id": "C-1",
+      "frontM": 7.61,
+      "backM": 16.5,
+      "leftM": 28.39,
+      "rightM": 37.35,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.18
+        }
+      ]
+    },
+    {
+      "id": "C-2",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 37.35,
+      "rightM": 37.29,
+      "additionalSides": []
+    },
+    {
+      "id": "C-3",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 37.29,
+      "rightM": 37.23,
+      "additionalSides": []
+    },
+    {
+      "id": "C-4",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 37.23,
+      "rightM": 37.17,
+      "additionalSides": []
+    },
+    {
+      "id": "C-5",
+      "frontM": 11.16,
+      "backM": 12,
+      "leftM": 37.17,
+      "rightM": 37.12,
+      "additionalSides": []
+    },
+    {
+      "id": "C-6",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 37.12,
+      "rightM": 37.07,
+      "additionalSides": []
+    },
+    {
+      "id": "C-7",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 37.07,
+      "rightM": 37.02,
+      "additionalSides": []
+    },
+    {
+      "id": "C-8",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 37.02,
+      "rightM": 36.97,
+      "additionalSides": []
+    },
+    {
+      "id": "C-9",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 37.97,
+      "rightM": 36.92,
+      "additionalSides": []
+    },
+    {
+      "id": "C-10",
+      "frontM": 7.38,
+      "backM": 16.5,
+      "leftM": 36.92,
+      "rightM": 27.89,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.1
+        }
+      ]
+    },
+    {
+      "id": "D-1",
+      "frontM": 13.75,
+      "backM": 22.8,
+      "leftM": 9.14,
+      "rightM": 18.35,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.18
+        }
+      ]
+    },
+    {
+      "id": "D-2",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.7,
+      "rightM": 36.66,
+      "additionalSides": []
+    },
+    {
+      "id": "D-3",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.66,
+      "rightM": 36.61,
+      "additionalSides": []
+    },
+    {
+      "id": "D-4",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.61,
+      "rightM": 36.56,
+      "additionalSides": []
+    },
+    {
+      "id": "D-5",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.56,
+      "rightM": 36.51,
+      "additionalSides": []
+    },
+    {
+      "id": "D-6",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.51,
+      "rightM": 36.46,
+      "additionalSides": []
+    },
+    {
+      "id": "D-7",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.46,
+      "rightM": 36.41,
+      "additionalSides": []
+    },
+    {
+      "id": "D-8",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.41,
+      "rightM": 36.35,
+      "additionalSides": []
+    },
+    {
+      "id": "D-9",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.35,
+      "rightM": 36.3,
+      "additionalSides": []
+    },
+    {
+      "id": "D-10",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.3,
+      "rightM": 36.25,
+      "additionalSides": []
+    },
+    {
+      "id": "D-11",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.25,
+      "rightM": 36.2,
+      "additionalSides": []
+    },
+    {
+      "id": "D-12",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.2,
+      "rightM": 36.15,
+      "additionalSides": []
+    },
+    {
+      "id": "D-13",
+      "frontM": 12,
+      "backM": 12,
+      "leftM": 36.15,
+      "rightM": 36.1,
+      "additionalSides": []
+    },
+    {
+      "id": "D-14",
+      "frontM": 6.45,
+      "backM": 17.45,
+      "leftM": 36.1,
+      "rightM": 30.08,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 10.42
+        }
+      ]
+    },
+    {
+      "id": "H-1",
+      "frontM": 15.2,
+      "backM": 14.65,
+      "leftM": 25.32,
+      "rightM": 26.08,
+      "additionalSides": []
+    },
+    {
+      "id": "H-2",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 26.08,
+      "rightM": 25.81,
+      "additionalSides": []
+    },
+    {
+      "id": "H-3",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 25.81,
+      "rightM": 25.53,
+      "additionalSides": []
+    },
+    {
+      "id": "H-4",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 25.53,
+      "rightM": 25.26,
+      "additionalSides": []
+    },
+    {
+      "id": "H-5",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 25.26,
+      "rightM": 24.99,
+      "additionalSides": []
+    },
+    {
+      "id": "H-6",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 24.99,
+      "rightM": 24.71,
+      "additionalSides": []
+    },
+    {
+      "id": "H-7",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 24.71,
+      "rightM": 24.44,
+      "additionalSides": []
+    },
+    {
+      "id": "H-8",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 24.44,
+      "rightM": 24.17,
+      "additionalSides": []
+    },
+    {
+      "id": "H-9",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 24.17,
+      "rightM": 23.89,
+      "additionalSides": []
+    },
+    {
+      "id": "H-10",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 23.89,
+      "rightM": 23.62,
+      "additionalSides": []
+    },
+    {
+      "id": "H-11",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 23.62,
+      "rightM": 23.35,
+      "additionalSides": []
+    },
+    {
+      "id": "H-12",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 23.35,
+      "rightM": 23.07,
+      "additionalSides": []
+    },
+    {
+      "id": "H-13",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 23.07,
+      "rightM": 22.8,
+      "additionalSides": []
+    },
+    {
+      "id": "H-14",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 22.8,
+      "rightM": 22.53,
+      "additionalSides": []
+    },
+    {
+      "id": "H-15",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 22.53,
+      "rightM": 22.25,
+      "additionalSides": []
+    },
+    {
+      "id": "H-16",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 22.25,
+      "rightM": 21.98,
+      "additionalSides": []
+    },
+    {
+      "id": "H-17",
+      "frontM": 8.36,
+      "backM": 4.58,
+      "leftM": 21.98,
+      "rightM": 4.58,
+      "additionalSides": [
+        {
+          "label": "Esquina da frente",
+          "meters": 10.23
+        },
+        {
+          "label": "Esquina de trás",
+          "meters": 14.14
+        }
+      ]
+    },
+    {
+      "id": "I-1",
+      "frontM": 4.37,
+      "backM": 12.15,
+      "leftM": 10.02,
+      "rightM": 20,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 15.19
+        }
+      ]
+    },
+    {
+      "id": "I-2",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-3",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-4",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-5",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-6",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-7",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-8",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-9",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-10",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-11",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-12",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-13",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-14",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-15",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "I-16",
+      "frontM": 1.8,
+      "backM": 10.8,
+      "leftM": 20,
+      "rightM": 11,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.14
+        }
+      ]
+    },
+    {
+      "id": "J-1",
+      "frontM": 6,
+      "backM": 15,
+      "leftM": 11,
+      "rightM": 20,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.14
+        }
+      ]
+    },
+    {
+      "id": "J-2",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-3",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-4",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-5",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-6",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-7",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-8",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-9",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-10",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-11",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-12",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-13",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 20,
+      "rightM": 20,
+      "additionalSides": []
+    },
+    {
+      "id": "J-14",
+      "frontM": 6,
+      "backM": 15,
+      "leftM": 11,
+      "rightM": 20,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.14
+        }
+      ]
+    },
+    {
+      "id": "K-1",
+      "frontM": 2.94,
+      "backM": 10,
+      "leftM": 17.37,
+      "rightM": 24.38,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 10.97
+        }
+      ]
+    },
+    {
+      "id": "K-2",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 24.38,
+      "rightM": 24.41,
+      "additionalSides": []
+    },
+    {
+      "id": "K-3",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 24.41,
+      "rightM": 24.45,
+      "additionalSides": []
+    },
+    {
+      "id": "K-4",
+      "frontM": 2.96,
+      "backM": 10,
+      "leftM": 24.45,
+      "rightM": 17.5,
+      "additionalSides": []
+    },
+    {
+      "id": "L-1",
+      "frontM": 2.9,
+      "backM": 10,
+      "leftM": 18.31,
+      "rightM": 25.27,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 11.36
+        }
+      ]
+    },
+    {
+      "id": "L-2",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 25.27,
+      "rightM": 25.17,
+      "additionalSides": []
+    },
+    {
+      "id": "L-3",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 25.17,
+      "rightM": 25.06,
+      "additionalSides": []
+    },
+    {
+      "id": "L-4",
+      "frontM": 2.81,
+      "backM": 10,
+      "leftM": 25.06,
+      "rightM": 18.03,
+      "additionalSides": []
+    },
+    {
+      "id": "M-1",
+      "frontM": 3.19,
+      "backM": 10,
+      "leftM": 18.05,
+      "rightM": 25.02,
+      "additionalSides": []
+    },
+    {
+      "id": "M-2",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 25.02,
+      "rightM": 24.92,
+      "additionalSides": []
+    },
+    {
+      "id": "M-3",
+      "frontM": 10,
+      "backM": 10,
+      "leftM": 24.92,
+      "rightM": 24.81,
+      "additionalSides": []
+    },
+    {
+      "id": "M-4",
+      "frontM": 2.81,
+      "backM": 10,
+      "leftM": 24.81,
+      "rightM": 17.78,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 10.92
+        }
+      ]
+    },
+    {
+      "id": "N-1",
+      "frontM": 5,
+      "backM": 10.04,
+      "leftM": 15.25,
+      "rightM": 24.15,
+      "additionalSides": [
+        {
+          "label": "Esquina",
+          "meters": 14.14
+        }
+      ]
+    },
+    {
+      "id": "N-2",
+      "frontM": 10.27,
+      "backM": 10,
+      "leftM": 24.15,
+      "rightM": 24.15,
+      "additionalSides": []
+    }
+  ]
+}

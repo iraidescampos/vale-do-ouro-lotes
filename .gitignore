@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+config.local.js
+
+# Materiais locais de preparação e administração
+tools/
+supabase/
+
+# Cópias locais com dados comerciais e geometria bruta
+data/lots.json
+data/cad-map-raw.json
