@@ -737,14 +737,17 @@ async function handleLogout() {
 function bindEvents() {
   elements.map.addEventListener("click", (event) => {
     if (suppressMapClick) return;
-    const zoomButton = event.target.closest("[data-zoom]");
+    // setPointerCapture no pan/zoom prende o alvo do click no viewport; refazer o
+    // hit-test pelas coordenadas evita que o clique do mouse se perca no desktop.
+    const hit = document.elementFromPoint(event.clientX, event.clientY) ?? event.target;
+    const zoomButton = hit.closest("[data-zoom]");
     if (zoomButton) {
       if (zoomButton.dataset.zoom === "in") aerialZoom.zoomIn();
       else if (zoomButton.dataset.zoom === "out") aerialZoom.zoomOut();
       else aerialZoom.reset();
       return;
     }
-    const button = event.target.closest("[data-lot-id]");
+    const button = hit.closest("[data-lot-id]");
     if (button && !button.classList.contains("filtered-out")) selectLot(button.dataset.lotId, true);
   });
   elements.map.addEventListener("keydown", (event) => { const lot = event.target.closest("[data-lot-id]"); if (lot && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectLot(lot.dataset.lotId, true); } });
