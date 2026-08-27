@@ -217,8 +217,6 @@ input:focus, select:focus { border-color: var(--forest-2); box-shadow: 0 0 0 3px
 .simulation-result strong { display: block; margin: 5px 0; font-family: "Fraunces", serif; font-size: 2rem; }
 .panel-action { width: 100%; margin-top: 14px; }
 .blocked-note { margin-top: 14px; padding: 12px; border-radius: 12px; color: var(--muted); background: #f4f3ef; font-size: .82rem; line-height: 1.5; }
-.data-warning { display: grid; gap: 4px; margin: 0 0 16px; padding: 12px; border: 1px solid #efd59a; border-radius: 12px; color: #704f0e; background: #fff6df; font-size: .8rem; line-height: 1.45; }
-.data-warning span { color: #826a38; }
 
 .table-shell { overflow: auto; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: 0 12px 34px rgb(18 56 47 / .06); }
 table { width: 100%; border-collapse: collapse; white-space: nowrap; }
@@ -247,6 +245,9 @@ tbody tr:hover { background: #fafbf8; }
 .reservation-pill.cancelada, .reservation-pill.expirada { background: var(--unavailable); }
 .admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .admin-form-grid label:last-child { grid-column: 1 / -1; }
+.computed-total { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 12px; background: #f4f6f2; }
+.computed-total span { color: var(--muted); font-size: .82rem; }
+.computed-total strong { color: var(--forest); font-size: 1.1rem; }
 .broker-management-grid { display: grid; grid-template-columns: minmax(300px, .72fr) minmax(560px, 1.28fr); gap: 16px; align-items: start; }
 .admin-create-form, .broker-list-card { padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 12px 34px rgb(18 56 47 / .06); }
 .admin-create-form { display: grid; gap: 14px; }

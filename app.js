@@ -74,7 +74,6 @@ const elements = {
 
 const adminLotMoney = {
   pricePerM2: bindCurrencyInput(elements.adminLotForm.elements.pricePerM2),
-  totalPrice: bindCurrencyInput(elements.adminLotForm.elements.totalPrice),
   downPayment: bindCurrencyInput(elements.adminLotForm.elements.downPayment),
 };
 
@@ -111,6 +110,7 @@ function transformLot(row) {
     financedAmount,
     installments,
     status: row.status,
+    buyerName: row.buyer_name ?? null,
   };
 }
 
@@ -122,10 +122,6 @@ function filteredLots() {
     const matchesStatus = state.status === "all" || lot.status === state.status;
     return matchesQuery && matchesBlock && matchesStatus;
   });
-}
-
-function hasPriceMismatch(lot) {
-  return lot.pricePerM2 != null && lot.totalPrice != null && Math.abs((lot.areaM2 * lot.pricePerM2) - lot.totalPrice) > 0.05;
 }
 
 function formatMeters(value) {
@@ -297,8 +293,9 @@ function renderAdminLots() {
     <td>${lot.totalPrice == null ? "—" : money.format(lot.totalPrice)}</td>
     <td>${lot.defaultDownPayment == null ? "—" : money.format(lot.defaultDownPayment)}</td>
     <td><span class="status-pill ${lot.status}">${STATUS[lot.status]}</span></td>
+    <td>${lot.buyerName ? escapeHtml(lot.buyerName) : "—"}</td>
     <td><button class="table-link" type="button" data-admin-edit-lot="${lot.id}">Editar</button></td>
-  </tr>`).join("") : `<tr><td colspan="7">Nenhum lote encontrado.</td></tr>`;
+  </tr>`).join("") : `<tr><td colspan="8">Nenhum lote encontrado.</td></tr>`;
 }
 
 function renderAdminReservations() {
@@ -395,15 +392,28 @@ async function switchPageTab(tab) {
   if (tab === "administracao") await loadAdminData();
 }
 
+function updateAdminLotComputedTotal() {
+  const area = Number(elements.adminLotForm.elements.areaM2.value);
+  const pricePerM2 = adminLotMoney.pricePerM2.getValue();
+  const output = document.querySelector("#adminLotComputedTotal");
+  if (!area || pricePerM2 == null) {
+    output.textContent = "—";
+    return;
+  }
+  output.textContent = money.format(area * pricePerM2);
+}
+
 function openAdminLotEditor(lotId) {
   const lot = state.lots.find((item) => item.id === lotId);
   if (!lot || !state.isAdmin) return;
   document.querySelector("#adminLotTitle").textContent = `Editar ${lot.id}`;
   elements.adminLotForm.elements.lotId.value = lot.id;
   elements.adminLotForm.elements.status.value = lot.status;
+  elements.adminLotForm.elements.areaM2.value = lot.areaM2 ?? "";
+  elements.adminLotForm.elements.buyerName.value = lot.buyerName ?? "";
   adminLotMoney.pricePerM2.setValue(lot.pricePerM2);
-  adminLotMoney.totalPrice.setValue(lot.totalPrice);
   adminLotMoney.downPayment.setValue(lot.defaultDownPayment);
+  updateAdminLotComputedTotal();
   elements.adminLotDialog.showModal();
 }
 
@@ -415,13 +425,14 @@ async function saveAdminLot(event) {
   const parameters = {
     p_lot_id: String(data.get("lotId")),
     p_status: String(data.get("status")),
+    p_area_m2: Number(data.get("areaM2")),
     p_price_per_m2: adminLotMoney.pricePerM2.getValue(),
-    p_total_price: adminLotMoney.totalPrice.getValue(),
     p_default_down_payment: adminLotMoney.downPayment.getValue(),
+    p_buyer_name: String(data.get("buyerName") ?? "").trim() || null,
   };
   elements.saveAdminLotButton.disabled = true;
   elements.saveAdminLotButton.textContent = "Salvando...";
-  const { error } = await supabase.rpc("admin_update_lot", parameters);
+  const { error } = await supabase.rpc("admin_update_lot_full", parameters);
   elements.saveAdminLotButton.disabled = false;
   elements.saveAdminLotButton.textContent = "Salvar alterações";
   if (error) return showToast(error.message || "Não foi possível atualizar o lote.", true);
@@ -512,9 +523,9 @@ function renderPanel() {
       <div class="detail-card"><span>Valor por m²</span><strong>${lot.pricePerM2 == null ? "—" : money.format(lot.pricePerM2)}</strong></div>
       <div class="detail-card"><span>Valor do lote</span><strong>${lot.totalPrice == null ? "A cadastrar" : money.format(lot.totalPrice)}</strong></div>
       <div class="detail-card"><span>Entrada padrão</span><strong>${lot.defaultDownPayment == null ? "—" : money.format(lot.defaultDownPayment)}</strong></div>
+      ${lot.buyerName ? `<div class="detail-card"><span>Comprador</span><strong>${escapeHtml(lot.buyerName)}</strong></div>` : ""}
     </div>
     ${measurementsMarkup(lot)}
-    ${hasPriceMismatch(lot) ? `<div class="data-warning"><strong>Conferir valor na planilha</strong><span>O valor total informado não corresponde a área × valor por m². A simulação preserva o valor total cadastrado.</span></div>` : ""}
     ${simulationMarkup(lot)}
     ${canReserve ? `<button class="button button-primary panel-action" id="reserveButton" type="button">Reservar este lote</button>` : `<div class="blocked-note">A reserva só está disponível para lotes marcados como disponíveis.</div>`}`;
   if (lot.totalPrice != null) bindSimulator(lot);
@@ -668,7 +679,7 @@ async function loadLots() {
   }
   const { data, error } = await supabase
     .from("lots")
-    .select("id,block,lot,area_m2,price_per_m2,total_price,default_down_payment,status,updated_at")
+    .select("id,block,lot,area_m2,price_per_m2,total_price,default_down_payment,status,buyer_name,updated_at")
     .order("block", { ascending: true })
     .order("lot", { ascending: true });
 
@@ -769,6 +780,8 @@ function bindEvents() {
   elements.adminLotsTable.addEventListener("click", (event) => { const button = event.target.closest("[data-admin-edit-lot]"); if (button) openAdminLotEditor(button.dataset.adminEditLot); });
   elements.adminReservationsTable.addEventListener("click", (event) => { const button = event.target.closest("[data-admin-cancel-reservation]"); if (button) cancelAdminReservation(button.dataset.adminCancelReservation, button.dataset.lotId); });
   elements.adminLotForm.addEventListener("submit", saveAdminLot);
+  elements.adminLotForm.elements.areaM2.addEventListener("input", updateAdminLotComputedTotal);
+  elements.adminLotForm.elements.pricePerM2.addEventListener("currencychange", updateAdminLotComputedTotal);
   elements.brokerForm.addEventListener("submit", createBroker);
   document.querySelector("#generateBrokerPassword").addEventListener("click", generateTemporaryPassword);
   elements.showBrokerPassword.addEventListener("change", () => { elements.brokerForm.elements.password.type = elements.showBrokerPassword.checked ? "text" : "password"; });

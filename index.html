@@ -188,7 +188,7 @@
             <label><span>Buscar lote</span><input id="adminLotSearch" type="search" placeholder="Ex.: H-11" autocomplete="off" /></label>
             <label><span>Situação</span><select id="adminLotStatus"><option value="all">Todas</option><option value="disponivel">Disponível</option><option value="reservado">Reservado</option><option value="vendido">Vendido</option><option value="indisponivel">Indisponível</option><option value="sem_cadastro">Cadastro pendente</option></select></label>
           </div>
-          <div class="table-shell admin-table-shell"><table><thead><tr><th>Lote</th><th>Área</th><th>Valor m²</th><th>Valor do lote</th><th>Entrada</th><th>Situação</th><th></th></tr></thead><tbody id="adminLotsTableBody"></tbody></table></div>
+          <div class="table-shell admin-table-shell"><table><thead><tr><th>Lote</th><th>Área</th><th>Valor m²</th><th>Valor do lote</th><th>Entrada</th><th>Situação</th><th>Comprador</th><th></th></tr></thead><tbody id="adminLotsTableBody"></tbody></table></div>
         </div>
 
         <div class="admin-tab-panel" data-admin-panel="reservations" hidden>
@@ -298,10 +298,15 @@
         </div>
         <p class="technical-note">Ao alterar um lote reservado, a reserva ativa será convertida em venda ou cancelada, conforme a nova situação.</p>
         <label><span>Situação</span><select name="status" required><option value="disponivel">Disponível</option><option value="reservado">Reservado (reserva ativa)</option><option value="vendido">Vendido</option><option value="indisponivel">Indisponível</option><option value="sem_cadastro">Cadastro pendente</option></select></label>
+        <label><span>Nome do comprador</span><input name="buyerName" type="text" maxlength="160" autocomplete="off" placeholder="Deixe em branco se não houver" /></label>
         <div class="admin-form-grid">
+          <label><span>Área (m²)</span><input name="areaM2" type="number" min="0" step="0.01" required /></label>
           <label><span>Valor por m²</span><input name="pricePerM2" type="text" inputmode="decimal" autocomplete="off" /></label>
-          <label><span>Valor do lote</span><input name="totalPrice" type="text" inputmode="decimal" autocomplete="off" /></label>
           <label><span>Entrada padrão</span><input name="downPayment" type="text" inputmode="decimal" autocomplete="off" /></label>
+        </div>
+        <div class="computed-total">
+          <span>Valor do lote (área × valor por m²)</span>
+          <strong id="adminLotComputedTotal">—</strong>
         </div>
         <div class="modal-actions">
           <button class="button button-ghost" value="cancel" formnovalidate>Cancelar</button>
