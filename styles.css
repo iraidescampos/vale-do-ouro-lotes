@@ -71,6 +71,8 @@ h1, h2, h3 { font-family: "Fraunces", Georgia, serif; line-height: 1.06; }
 h1 { max-width: 780px; margin: 0; font-size: clamp(2.8rem, 6vw, 5.5rem); letter-spacing: -.045em; }
 .hero-copy > p:not(.eyebrow) { max-width: 660px; color: var(--muted); font-size: 1.1rem; line-height: 1.7; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.export-option { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--muted); font-size: .82rem; font-weight: 600; }
+.export-option input { width: 16px; height: 16px; }
 .button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: #fff; text-decoration: none; font-weight: 700; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
 .button:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgb(18 56 47 / .1); }
 .button-primary { background: var(--forest); border-color: var(--forest); color: #fff; }
@@ -334,4 +336,5 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px
   .print-report table { white-space: normal; font-size: 7pt; }
   .print-report th, .print-report td { padding: 4px 5px; border: 1px solid #aaa; }
   .print-report th { position: static; background: #e7eee9; }
+  .print-report, .print-report * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

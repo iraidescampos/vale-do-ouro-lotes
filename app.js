@@ -615,12 +615,41 @@ function showToast(message, isError = false) {
   window.setTimeout(() => elements.toast.classList.remove("visible"), 4200);
 }
 
+const STATUS_FILL = {
+  vendido: "Green",
+  indisponivel: "Yellow",
+};
+const FILL_COLORS = { Green: "#C6EFCE", Yellow: "#FFFF00", Blue: "#BDD7EE" };
+
+function lotFillStyle(lot) {
+  if ((lot.buyerName ?? "").toUpperCase().includes("PERMUTA")) return "Blue";
+  return STATUS_FILL[lot.status] ?? null;
+}
+
 function exportExcel() {
   const lots = filteredLots();
-  const headers = ["Quadra", "Lote", "Área (m²)", "Frente (m)", "Fundo (m)", "Lado esquerdo (m)", "Lado direito (m)", "Outras medidas", "Valor m²", "Valor do lote", "Entrada", "Financiado", "12x", "24x", "36x", "48x", "60x", "120x", "150x", "180x", "210x", "240x", "Situação"];
-  const rows = lots.map((lot) => [lot.block, lot.lot, lot.areaM2, lot.measurements?.frontM ?? null, lot.measurements?.backM ?? null, lot.measurements?.leftM ?? null, lot.measurements?.rightM ?? null, lot.measurements?.additionalSides.map((side) => `${side.label}: ${formatMeters(side.meters)}`).join("; ") ?? "", lot.pricePerM2, lot.totalPrice, lot.defaultDownPayment, lot.financedAmount, ...[12,24,36,48,60,120,150,180,210,240].map((term) => lot.installments[term] ?? null), STATUS[lot.status]]);
-  const cell = (value, header = false) => `<Cell ss:StyleID="${header ? "Header" : typeof value === "number" ? "Number" : "Text"}"><Data ss:Type="${typeof value === "number" ? "Number" : "String"}">${xmlEscape(value ?? "")}</Data></Cell>`;
-  const xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#12382F" ss:Pattern="Solid"/></Style><Style ss:ID="Text"/><Style ss:ID="Number"><NumberFormat ss:Format="#\,##0.00"/></Style></Styles><Worksheet ss:Name="Lotes"><Table>${`<Row>${headers.map((value) => cell(value, true)).join("")}</Row>`}${rows.map((row) => `<Row>${row.map((value) => cell(value)).join("")}</Row>`).join("")}</Table></Worksheet></Workbook>`;
+  const includeMeasurements = document.querySelector("#exportMeasurementsToggle").checked;
+  const measurementHeaders = ["Frente (m)", "Fundo (m)", "Lado esquerdo (m)", "Lado direito (m)", "Outras medidas"];
+  const headers = ["Quadra", "Lote", "Área (m²)", ...(includeMeasurements ? measurementHeaders : []), "Valor m²", "Valor do lote", "Entrada", "Financiado", "12x", "24x", "36x", "48x", "60x", "120x", "150x", "180x", "210x", "240x", "Situação", "Comprador"];
+  const rows = lots.map((lot) => [
+    lot.block, lot.lot, lot.areaM2,
+    ...(includeMeasurements ? [
+      lot.measurements?.frontM ?? null, lot.measurements?.backM ?? null, lot.measurements?.leftM ?? null, lot.measurements?.rightM ?? null,
+      lot.measurements?.additionalSides.map((side) => `${side.label}: ${formatMeters(side.meters)}`).join("; ") ?? "",
+    ] : []),
+    lot.pricePerM2, lot.totalPrice, lot.defaultDownPayment, lot.financedAmount,
+    ...[12,24,36,48,60,120,150,180,210,240].map((term) => lot.installments[term] ?? null),
+    STATUS[lot.status], lot.buyerName ?? "",
+  ]);
+  const cell = (value, fill, header = false) => {
+    const isNumber = typeof value === "number";
+    const styleId = header ? "Header" : `${isNumber ? "Number" : "Text"}${fill ?? ""}`;
+    return `<Cell ss:StyleID="${styleId}"><Data ss:Type="${isNumber ? "Number" : "String"}">${xmlEscape(value ?? "")}</Data></Cell>`;
+  };
+  const styleDefs = Object.keys(FILL_COLORS).map((fill) => `
+    <Style ss:ID="Text${fill}"><Interior ss:Color="${FILL_COLORS[fill]}" ss:Pattern="Solid"/></Style>
+    <Style ss:ID="Number${fill}"><NumberFormat ss:Format="#\,##0.00"/><Interior ss:Color="${FILL_COLORS[fill]}" ss:Pattern="Solid"/></Style>`).join("");
+  const xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#12382F" ss:Pattern="Solid"/></Style><Style ss:ID="Text"/><Style ss:ID="Number"><NumberFormat ss:Format="#\,##0.00"/></Style>${styleDefs}</Styles><Worksheet ss:Name="Lotes"><Table>${`<Row>${headers.map((value) => cell(value, null, true)).join("")}</Row>`}${rows.map((row, index) => `<Row>${row.map((value) => cell(value, lotFillStyle(lots[index]))).join("")}</Row>`).join("")}</Table></Worksheet></Workbook>`;
   downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8" }), `lotes-vale-do-ouro-${new Date().toISOString().slice(0,10)}.xls`);
   showToast("Arquivo do Excel gerado com os lotes filtrados.");
 }
@@ -636,7 +665,12 @@ function downloadBlob(blob, filename) {
 
 function buildPrintReport() {
   const lots = filteredLots();
-  elements.printReport.innerHTML = `<h1>Vale do Ouro — relatório de lotes</h1><p>Gerado em ${new Date().toLocaleString("pt-BR")} · ${lots.length} lotes</p><table><thead><tr><th>Quadra</th><th>Lote</th><th>Área</th><th>Medidas</th><th>Valor m²</th><th>Valor lote</th><th>Entrada</th><th>12x</th><th>24x</th><th>36x</th><th>60x</th><th>120x</th><th>180x</th><th>240x</th><th>Situação</th></tr></thead><tbody>${lots.map((lot) => `<tr><td>${lot.block}</td><td>${lot.lot}</td><td>${number.format(lot.areaM2)} m²</td><td>${compactMeasurements(lot)}</td><td>${lot.pricePerM2 == null ? "—" : money.format(lot.pricePerM2)}</td><td>${lot.totalPrice == null ? "—" : money.format(lot.totalPrice)}</td><td>${lot.defaultDownPayment == null ? "—" : money.format(lot.defaultDownPayment)}</td>${[12,24,36,60,120,180,240].map((term) => `<td>${lot.installments[term] == null ? "—" : money.format(lot.installments[term])}</td>`).join("")}<td>${STATUS[lot.status]}</td></tr>`).join("")}</tbody></table>`;
+  const includeMeasurements = document.querySelector("#exportMeasurementsToggle").checked;
+  elements.printReport.innerHTML = `<h1>Vale do Ouro — relatório de lotes</h1><p>Gerado em ${new Date().toLocaleString("pt-BR")} · ${lots.length} lotes</p><table><thead><tr><th>Quadra</th><th>Lote</th><th>Área</th>${includeMeasurements ? "<th>Medidas</th>" : ""}<th>Valor m²</th><th>Valor lote</th><th>Entrada</th><th>12x</th><th>24x</th><th>36x</th><th>60x</th><th>120x</th><th>180x</th><th>240x</th><th>Situação</th><th>Comprador</th></tr></thead><tbody>${lots.map((lot) => {
+    const fill = lotFillStyle(lot);
+    const rowStyle = fill ? ` style="background:${FILL_COLORS[fill]}"` : "";
+    return `<tr${rowStyle}><td>${lot.block}</td><td>${lot.lot}</td><td>${number.format(lot.areaM2)} m²</td>${includeMeasurements ? `<td>${compactMeasurements(lot)}</td>` : ""}<td>${lot.pricePerM2 == null ? "—" : money.format(lot.pricePerM2)}</td><td>${lot.totalPrice == null ? "—" : money.format(lot.totalPrice)}</td><td>${lot.defaultDownPayment == null ? "—" : money.format(lot.defaultDownPayment)}</td>${[12,24,36,60,120,180,240].map((term) => `<td>${lot.installments[term] == null ? "—" : money.format(lot.installments[term])}</td>`).join("")}<td>${STATUS[lot.status]}</td><td>${lot.buyerName ? escapeHtml(lot.buyerName) : "—"}</td></tr>`;
+  }).join("")}</tbody></table>`;
 }
 
 function friendlyLoginError(error) {
