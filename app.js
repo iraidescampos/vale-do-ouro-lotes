@@ -1,5 +1,5 @@
-import { createMapZoom } from "./map-zoom.js";
-import { bindCurrencyInput } from "./currency-input.js";
+import { createMapZoom } from "./map-zoom.js?v=20260908-1";
+import { bindCurrencyInput } from "./currency-input.js?v=20260908-1";
 
 const STATUS = {
   disponivel: "Disponível",
