@@ -71,6 +71,9 @@ export function createMapZoom({ minScale = 1, maxScale = 4, onDragEnd } = {}) {
   }
 
   function onWheel(event) {
+    // Sem Ctrl/Cmd, deixa a roda do mouse rolar a página normalmente (o pinça do
+    // trackpad já manda ctrlKey sozinho, então continua dando zoom sem precisar apertar nada).
+    if (!event.ctrlKey && !event.metaKey) return;
     event.preventDefault();
     const factor = event.deltaY > 0 ? 0.88 : 1.12;
     zoomAt(scale * factor, event.clientX, event.clientY);

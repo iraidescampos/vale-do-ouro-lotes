@@ -138,7 +138,7 @@ function renderAerialMap() {
       <polygon points="${points}"></polygon><text x="${centerX}" y="${centerY + 1.7}">${lot.lot}</text><title>${label}</title>
     </g>`;
   }).join("");
-  return `<div class="map-pan-hint" aria-hidden="true">↔ Arraste para os lados · pinça ou roda do mouse para dar zoom</div>
+  return `<div class="map-pan-hint" aria-hidden="true">↔ Arraste para os lados · pinça ou Ctrl + roda do mouse para dar zoom</div>
   <div class="cad-map-shell">
     <div class="cad-map-viewport">
       <div class="cad-map-stage">
